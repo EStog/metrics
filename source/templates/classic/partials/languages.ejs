@@ -8,7 +8,7 @@
   <% for (const section of (plugins.languages.sections ?? ["error"])) { const languages = {"most-used":plugins.languages.favorites, "recently-used":plugins.languages.recent}[section] %>
     <section class="column">
       <h3 class="field">
-        <%= {"most-used":"Most used languages", "recently-used":"Recently used languages", error:""}[section] %>
+        <%= {"most-used":"Languages by use amount", "recently-used":"Languages by recent use", error:""}[section] %>
       </h3>
       <% if (plugins.languages.error) { %>
         <section>
