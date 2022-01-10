@@ -1,10 +1,10 @@
 name: "🧱 Core"
-cost: N/A
 category: core
 supports:
   - user
   - organization
   - repository
+scopes: []
 inputs:
 
   # User account personal token
@@ -94,12 +94,27 @@ inputs:
       - pull-request-rebase # Same as "pull-request" and additionaly rebase and merge pull request
       - gist                # Save output to "committer_gist"
 
+  # Output condition
+  output_condition:
+    description: Output condition
+    type: string
+    default: always
+    values:
+      - always        # Always push changes
+      - data-changed  # Skip changes if no actual data changed (e.g. when only render timestamp changed)
+
   # Optimize SVG image to reduce its filesize
   # Some templates may not support this option
   optimize:
     description: SVG optimization
-    type: boolean
-    default: yes
+    type: array
+    default: css, xml
+    format:
+      - comma-separated
+    values:
+      - css  # Purge and minify CSS styles
+      - xml  # Pretty-print XML
+      - svg  # Optimize SVG with SVGO (experimental, require --optimize-svg flag)
 
   # Setup additional templates from remote repositories
   setup_community_templates:
@@ -183,6 +198,13 @@ inputs:
     type: boolean
     default: yes
 
+  # Encode images links into base64 data
+  # Advised to be true when generating images and false when generating texts or JSON
+  config_base64:
+    description: Encode images links into base64 data
+    type: boolean
+    default: yes
+
   # Configure padding for output image (percentage value)
   # It can be used to add padding to generated metrics if rendering is cropped or has too much empty space
   # Specify one value (for both width and height) or two values (one for width and one for height)
@@ -197,13 +219,14 @@ inputs:
     type: string
     default: auto
     values:
-      - auto         # Defaults to template default
+      - auto           # Defaults to template default
       - svg
-      - png          # Does not support animations
-      - jpeg         # Does not support animations and transparency
-      - json         # Outputs a JSON file instead of an image
-      - markdown     # Outputs a Markdown file instead of an image
-      - markdown-pdf # Outputs a Markdown file as PDF instead of an image
+      - png            # Does not support animations
+      - jpeg           # Does not support animations and transparency
+      - json           # Outputs a JSON file instead of an image
+      - markdown       # Outputs a Markdown file instead of an image
+      - markdown-pdf   # Outputs a Markdown file as PDF instead of an image
+      - insights       # Outputs a rendered HTML file of Metrics Insights
 
   # Number of retries in case rendering fail
   retries:
@@ -218,6 +241,22 @@ inputs:
     description: Time to wait (in seconds) before each retry
     type: number
     default: 300
+    min: 0
+    max: 3600
+
+  # Number of retries in case output action fail
+  retries_output_action:
+    description: Number of retries (output action)
+    type: number
+    default: 5
+    min: 1
+    max: 10
+
+  # Time to wait (in seconds) before each retry (output action)
+  retries_delay_output_action:
+    description: Time to wait (in seconds) before each retry (output action)
+    type: number
+    default: 120
     min: 0
     max: 3600
 
@@ -264,13 +303,14 @@ inputs:
     default: no
 
   # Experimental features
+  # Note that no backward compatibility are guaranteed for these features
   experimental_features:
     description: Experimental features
     type: array
     format: space-separated
     default: ""
     values:
-      - --optimize
+      - --optimize-svg
 
   # Use mocked data to bypass external APIs
   use_mocked_data:

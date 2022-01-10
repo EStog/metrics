@@ -1,11 +1,13 @@
 name: "🗂️ Active projects"
-cost: 1 GraphQL request + 1 GraphQL request per repository project
 category: github
-index: 15
+index: 11
 supports:
   - user
   - organization
   - repository
+scopes:
+  - public_access
+  - public_repo
 inputs:
 
   # Enable or disable plugin

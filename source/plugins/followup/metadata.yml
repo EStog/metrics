@@ -1,11 +1,12 @@
 name: "🎟️ Follow-up of issues and pull requests"
-cost: 0 API request (1 GraphQL request if "user" section is enabled)
 category: github
-index: 11
+index: 7
 supports:
   - user
   - organization
   - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin
@@ -23,3 +24,9 @@ inputs:
     values:
       - repositories # Overall status of issues and pull requests on your repositories
       - user         # Overall status of issues and pull requests you have created on GitHub
+
+  # Compute issues and pull requests per repositories with special highlighting for maintainers and specified users
+  plugin_followup_indepth:
+    description: Indepth follow-up processing
+    type: boolean
+    default: no

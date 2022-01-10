@@ -1,11 +1,12 @@
 name: "🧮 Repositories traffic"
-cost: 1 REST request per repository
 category: github
-index: 13
+index: 19
 supports:
   - user
   - organization
   - repository
+scopes:
+  - repo
 inputs:
 
   # Enable or disable plugin
@@ -13,3 +14,11 @@ inputs:
     description: Display repositories traffic metrics
     type: boolean
     default: no
+
+  # List of repositories that will be skipped
+  plugin_traffic_skipped:
+    description: Repositories to skip
+    type: array
+    format: comma-separated
+    default: ""
+    example: my-repo-1, my-repo-2, owner/repo-3 ...

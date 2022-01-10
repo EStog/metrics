@@ -81,10 +81,10 @@ export default async function({mock, nosettings} = {}) {
   const limiter = ratelimit({max:debug ? Number.MAX_SAFE_INTEGER : 60, windowMs:60 * 1000, headers:false})
   const metadata = Object.fromEntries(
     Object.entries(conf.metadata.plugins)
-      .map(([key, value]) => [key, Object.fromEntries(Object.entries(value).filter(([key]) => ["name", "icon", "category", "web", "supports"].includes(key)))])
+      .map(([key, value]) => [key, Object.fromEntries(Object.entries(value).filter(([key]) => ["name", "icon", "category", "web", "supports", "scopes"].includes(key)))])
       .map(([key, value]) => [key, key === "core" ? {...value, web:Object.fromEntries(Object.entries(value.web).filter(([key]) => /^config[.]/.test(key)).map(([key, value]) => [key.replace(/^config[.]/, ""), value]))} : value]),
   )
-  const enabled = Object.entries(metadata).filter(([_name, {category}]) => category !== "core").map(([name]) => ({name, enabled:plugins[name]?.enabled ?? false}))
+  const enabled = Object.entries(metadata).filter(([_name, {category}]) => category !== "core").map(([name]) => ({name, category:metadata[name]?.category ?? "community", enabled:plugins[name]?.enabled ?? false}))
   const templates = Object.entries(Templates).map(([name]) => ({name, enabled:(conf.settings.templates.enabled.length ? conf.settings.templates.enabled.includes(name) : true) ?? false}))
   const actions = {flush:new Map()}
   let requests = {limit:0, used:0, remaining:0, reset:NaN}
@@ -174,34 +174,7 @@ export default async function({mock, nosettings} = {}) {
       }
       //Compute metrics
       console.debug(`metrics/app/${login}/insights > compute insights`)
-      const json = await metrics(
-        {
-          login,
-          q:{
-            template:"classic",
-            achievements:true,
-            "achievements.threshold":"X",
-            isocalendar:true,
-            "isocalendar.duration":"full-year",
-            languages:true,
-            "languages.limit":0,
-            activity:true,
-            "activity.limit":100,
-            "activity.days":0,
-            notable:true,
-            followup:true,
-            "followup.sections":"repositories, user",
-            habits:true,
-            "habits.from":100,
-            "habits.days":7,
-            "habits.facts":false,
-            "habits.charts":true,
-            introduction:true
-          },
-        },
-        {graphql, rest, plugins:{achievements:{enabled:true}, isocalendar:{enabled:true}, languages:{enabled:true}, activity:{enabled:true, markdown:"extended"}, notable:{enabled:true}, followup:{enabled:true}, habits:{enabled:true}, introduction:{enabled:true}}, conf, convert:"json"},
-        {Plugins, Templates},
-      )
+      const json = await metrics.insights({login}, {graphql, rest, conf}, {Plugins, Templates})
       //Cache
       if ((!debug) && (cached)) {
         const maxage = Math.round(Number(req.query.cache))
@@ -286,7 +259,7 @@ export default async function({mock, nosettings} = {}) {
         conf,
         die:q["plugins.errors.fatal"] ?? false,
         verify:q.verify ?? false,
-        convert:["svg", "jpeg", "png", "json", "markdown", "markdown-pdf"].includes(q["config.output"]) ? q["config.output"] : null,
+        convert:["svg", "jpeg", "png", "json", "markdown", "markdown-pdf", "insights"].includes(q["config.output"]) ? q["config.output"] : null,
       }, {Plugins, Templates})
       //Cache
       if ((!debug) && (cached)) {

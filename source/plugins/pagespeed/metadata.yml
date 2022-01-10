@@ -1,11 +1,11 @@
 name: "⏱️ Website performances"
-cost: N/A
 category: social
 index: 1
 supports:
   - user
   - organization
   - repository
+scopes: []
 inputs:
 
   # Enable or disable plugin

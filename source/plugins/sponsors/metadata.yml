@@ -1,10 +1,12 @@
 name: "💕 GitHub Sponsors"
-cost: 1 GraphQL request
 category: github
 index: 23
 supports:
   - user
   - organization
+  - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin

@@ -14,7 +14,7 @@ See [rendering of this file here](https://github.com/lowlighter/lowlighter/blob/
 * Same formatting helpers available in templates can be used too
 
 ```markdown
-I joined GitHub on `{{ f.date(REGISTRATION_DATE, {dateStyle:"short"}) }}`.
+I joined GitHub on `{{ f.date(REGISTRATION_DATE, {date:true}) }}`.
 I contributed to `{{ REPOSITORIES_CONTRIBUTED_TO }}` repositories and made `{{ COMMITS }}` commits.
 ```
 
@@ -24,7 +24,7 @@ I contributed to `{{ REPOSITORIES_CONTRIBUTED_TO }}` repositories and made `{{ C
 
 Some plugins have their own **markdown** version which includes hyperlinks and reduce image overhead.
 
-See [compatibility matrix](https://github.com/lowlighter/metrics#-templateplugin-compatibily-matrix) for more informations.
+See [compatibility matrix](https://github.com/lowlighter/metrics#-plugin-compatibility-matrix) for more informations.
 
 ___
 

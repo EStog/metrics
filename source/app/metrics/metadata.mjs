@@ -5,7 +5,7 @@ import path from "path"
 import url from "url"
 
 //Defined categories
-const categories = ["core", "github", "social", "other"]
+const categories = ["core", "github", "social", "community"]
 
 /**Metadata descriptor parser */
 export default async function metadata({log = true} = {}) {
@@ -64,7 +64,7 @@ metadata.plugin = async function({__plugins, name, logger}) {
 
     //category
     if (!categories.includes(meta.category))
-      meta.category = "other"
+      meta.category = "community"
 
     //Inputs parser
     {
@@ -297,7 +297,11 @@ metadata.template = async function({__templates, name, plugins, logger}) {
       supports:meta.supports ?? null,
       readme:{
         demo:readme.match(/(?<demo><table>[\s\S]*?<[/]table>)/)?.groups?.demo?.replace(/<[/]?(?:table|tr)>/g, "")?.trim() ?? (name === "community" ? '<td align="center" colspan="2">See <a href="/source/templates/community/README.md">documentation</a> 🌍</td>' : "<td></td>"),
-        compatibility:{...compatibility, base:true},
+        compatibility:{
+          ...Object.fromEntries(Object.entries(compatibility).filter(([_, value]) => value)),
+          ...Object.fromEntries(Object.entries(compatibility).filter(([_, value]) => !value).map(([key, value]) => [key, meta.formats?.includes("markdown") ? "embed" : value])),
+          base:true
+        },
       },
       check({q, account = "bypass", format = null}) {
         //Support check

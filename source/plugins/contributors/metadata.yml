@@ -1,9 +1,10 @@
 name: "🏅 Repository contributors"
-cost: N/A
 category: github
-index: 5
+index: 6
 supports:
   - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin

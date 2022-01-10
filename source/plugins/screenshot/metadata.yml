@@ -1,11 +1,12 @@
 name: "📸 Website screenshot"
-cost: N/A
-category: other
-index: 2
+category: community
+authors:
+  - lowlighter
 supports:
   - user
   - organization
   - repository
+scopes: []
 inputs:
 
   # Enable or disable plugin

@@ -1,9 +1,9 @@
 name: "📌 Starred topics"
-cost: N/A
 category: github
-index: 7
+index: 2
 supports:
   - user
+scopes: []
 inputs:
 
   # Enable or disable plugin
@@ -19,6 +19,7 @@ inputs:
     default: starred
     values:
       - starred  # Display starred topics as labels
+      - icons    # Display starred topics as icons
       - mastered # Display starred topics as mastered/known technologies icons
 
   # Topics sorting order

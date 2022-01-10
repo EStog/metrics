@@ -1,10 +1,10 @@
 name: "🧩 <%= `${name.charAt(0).toLocaleUpperCase()}${name.substring(1)}` %>"
-cost: Estimates how many GitHub requests is used during plugin execution ("N/A" for Third-Party services)
-category: other   # Set plugin category ("github", "social" or "other")
+category: community # Leave as it
 supports:
-  - user          # Support users account
-  - organization  # Support organizations account
-  - repository    # Support repositories metrics
+  - user            # Support users account
+  - organization    # Support organizations account
+  - repository      # Support repositories metrics
+scopes: []          # Required scopes for personal access token
 inputs:
 
   # Enable or disable plugin

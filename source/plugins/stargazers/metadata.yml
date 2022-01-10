@@ -1,11 +1,12 @@
 name: "✨ Stargazers over last weeks"
-cost: 1 GraphQL request per 100 stargazers
 category: github
-index: 14
+index: 10
 supports:
   - user
   - organization
   - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin

@@ -17,7 +17,7 @@ export default async function({login, data, imports, q, rest, account}, {enabled
     }
 
     //Load inputs
-    let {ignored, skipped, colors, aliases, details, threshold, limit, indepth, sections, categories, "recent.categories":_recent_categories, "recent.load":_recent_load, "recent.days":_recent_days} = imports.metadata.plugins.languages.inputs({data, account, q})
+    let {ignored, skipped, colors, aliases, details, threshold, limit, indepth, "analysis.timeout":timeout, sections, categories, "recent.categories":_recent_categories, "recent.load":_recent_load, "recent.days":_recent_days} = imports.metadata.plugins.languages.inputs({data, account, q})
     threshold = (Number(threshold.replace(/%$/, "")) || 0) / 100
     skipped.push(...data.shared["repositories.skipped"])
     if (!limit)
@@ -60,18 +60,42 @@ export default async function({login, data, imports, q, rest, account}, {enabled
     if (extras) {
       //Recently used languages
       if ((sections.includes("recently-used"))&&(context.mode === "user")) {
-        console.debug(`metrics/compute/${login}/plugins > languages > using recent analyzer`)
-        languages["stats.recent"] = await recent_analyzer({login, data, imports, rest, account}, {skipped, categories:_recent_categories ?? categories, days:_recent_days, load:_recent_load})
-        Object.assign(languages.colors, languages["stats.recent"].colors)
+        try {
+          console.debug(`metrics/compute/${login}/plugins > languages > using recent analyzer`)
+          languages["stats.recent"] = await recent_analyzer({login, data, imports, rest, account}, {skipped, categories:_recent_categories ?? categories, days:_recent_days, load:_recent_load, timeout})
+          Object.assign(languages.colors, languages["stats.recent"].colors)
+        }
+        catch (error) {
+          console.debug(`metrics/compute/${login}/plugins > languages > ${error}`)
+        }
       }
 
       //Indepth mode
       if (indepth) {
-        console.debug(`metrics/compute/${login}/plugins > languages > switching to indepth mode (this may take some time)`)
-        const existingColors = languages.colors
-        Object.assign(languages, await indepth_analyzer({login, data, imports, repositories}, {skipped, categories}))
-        Object.assign(languages.colors, existingColors)
-        console.debug(`metrics/compute/${login}/plugins > languages > indepth analysis missed ${languages.missed} commits`)
+        try {
+          console.debug(`metrics/compute/${login}/plugins > languages > switching to indepth mode (this may take some time)`)
+          const existingColors = languages.colors
+          Object.assign(languages, await indepth_analyzer({login, data, imports, repositories}, {skipped, categories, timeout}))
+          Object.assign(languages.colors, existingColors)
+          console.debug(`metrics/compute/${login}/plugins > languages > indepth analysis missed ${languages.missed} commits`)
+        }
+        catch (error) {
+          console.debug(`metrics/compute/${login}/plugins > languages > ${error}`)
+        }
+      }
+    }
+
+    //Apply aliases and group languages when needed
+    for (const stats of [languages.stats, languages.lines, languages["stats.recent"].stats, languages["stats.recent"].lines]) {
+      if (!stats)
+        continue
+      for (const [language, value] of Object.entries(stats)) {
+        if (language.toLocaleLowerCase() in aliases) {
+          delete stats[language]
+          const alias = aliases[language.toLocaleLowerCase()]
+          stats[alias] = (stats[alias] ?? 0) + value
+          console.debug(`metrics/compute/${login}/plugins > languages > ${language} -> ${alias}: ${stats[alias]} (+${value})`)
+        }
       }
     }
 
@@ -92,13 +116,6 @@ export default async function({login, data, imports, q, rest, account}, {enabled
       }
     }
 
-    //Apply aliases
-    for (const section of ["favorites", "recent"]) {
-      for (const language of languages[section]) {
-        if (language.name.toLocaleLowerCase() in aliases)
-          language.name = aliases[language.name.toLocaleLowerCase()]
-      }
-    }
     //Results
     return languages
   }

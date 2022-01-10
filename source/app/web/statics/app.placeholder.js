@@ -178,36 +178,59 @@
               sections: options["followup.sections"].split(",").map(x => x.trim()).filter(x => ["user", "repositories"].includes(x)),
               issues: {
                 get count() {
-                  return this.open + this.closed
+                  return this.open + this.closed + this.drafts + this.skipped
                 },
                 open: faker.datatype.number(1000),
                 closed: faker.datatype.number(1000),
+                drafts: faker.datatype.number(100),
+                skipped: faker.datatype.number(100),
+                get collaborators() {
+                  return {
+                    open: faker.datatype.number(this.open),
+                    closed: faker.datatype.number(this.closed),
+                    drafts: faker.datatype.number(this.drafts),
+                    skipped: faker.datatype.number(this.skipped),
+                  }
+                }
               },
               pr: {
                 get count() {
-                  return this.open + this.merged
+                  return this.open + this.closed + this.merged + this.drafts
                 },
                 open: faker.datatype.number(1000),
                 closed: faker.datatype.number(1000),
                 merged: faker.datatype.number(1000),
+                drafts: faker.datatype.number(100),
+                get collaborators() {
+                  return {
+                    open: faker.datatype.number(this.open),
+                    closed: faker.datatype.number(this.closed),
+                    merged: faker.datatype.number(this.skipped),
+                    drafts: faker.datatype.number(this.drafts),
+                  }
+                }
               },
               user: {
                 issues: {
                   get count() {
-                    return this.open + this.closed
+                    return this.open + this.closed + this.drafts + this.skipped
                   },
                   open: faker.datatype.number(1000),
                   closed: faker.datatype.number(1000),
+                  drafts: faker.datatype.number(100),
+                  skipped: faker.datatype.number(100),
                 },
                 pr: {
                   get count() {
-                    return this.open + this.merged
+                    return this.open + this.closed + this.merged + this.drafts
                   },
                   open: faker.datatype.number(1000),
                   closed: faker.datatype.number(1000),
                   merged: faker.datatype.number(1000),
+                  drafts: faker.datatype.number(100),
                 },
               },
+              indepth:options["followup.indepth"] ? {} : null
             },
           })
           : null),
@@ -1131,6 +1154,14 @@
       return `${text.substring(0, length)}…`
     }
     data.f.date = function(string, options) {
+      if (options.date) {
+        delete options.date
+        Object.assign(options, {day:"numeric", month:"short", year:"numeric"})
+      }
+      if (options.time) {
+        delete options.time
+        Object.assign(options, {hour:"2-digit", minute:"2-digit", second:"2-digit"})
+      }
       return new Intl.DateTimeFormat("en-GB", options).format(new Date(string))
     }
     data.f.license = function(text) {

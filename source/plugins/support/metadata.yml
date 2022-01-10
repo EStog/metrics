@@ -1,9 +1,9 @@
 name: "💭 GitHub Community Support"
-cost: N/A
 category: github
-index: 19
+index: 17
 supports:
   - user
+scopes: []
 inputs:
 
   # Enable or disable plugin

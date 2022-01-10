@@ -1,9 +1,10 @@
 name: "🌟 Recently starred repositories"
-cost: 1 GraphQL request
 category: github
-index: 6
+index: 3
 supports:
   - user
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin

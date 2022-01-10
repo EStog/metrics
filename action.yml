@@ -118,11 +118,16 @@ inputs:
     description: Output action
     default: commit
   
+  # Output condition
+  output_condition:
+    description: Output condition
+    default: always
+  
   # Optimize SVG image to reduce its filesize
   # Some templates may not support this option
   optimize:
     description: SVG optimization
-    default: yes
+    default: css, xml
   
   # Setup additional templates from remote repositories
   setup_community_templates:
@@ -187,6 +192,12 @@ inputs:
     description: SVG CSS animations
     default: yes
   
+  # Encode images links into base64 data
+  # Advised to be true when generating images and false when generating texts or JSON
+  config_base64:
+    description: Encode images links into base64 data
+    default: yes
+  
   # Configure padding for output image (percentage value)
   # It can be used to add padding to generated metrics if rendering is cropped or has too much empty space
   # Specify one value (for both width and height) or two values (one for width and one for height)
@@ -208,6 +219,16 @@ inputs:
   retries_delay:
     description: Time to wait (in seconds) before each retry
     default: 300
+  
+  # Number of retries in case output action fail
+  retries_output_action:
+    description: Number of retries (output action)
+    default: 5
+  
+  # Time to wait (in seconds) before each retry (output action)
+  retries_delay_output_action:
+    description: Time to wait (in seconds) before each retry (output action)
+    default: 120
   
   # Throw on plugins errors
   # If disabled, metrics will handle errors gracefully with a message in rendered metrics
@@ -238,6 +259,7 @@ inputs:
     default: no
   
   # Experimental features
+  # Note that no backward compatibility are guaranteed for these features
   experimental_features:
     description: Experimental features
     default: ""
@@ -334,7 +356,15 @@ inputs:
     description: Indepth languages processing (see documentation before enabling)
     default: false
   
-  # Language categories to display
+  # Analysis timeout (in minutes)
+  # In case of timeout, it'll automatically fallback to default algorithm
+  # Please be nice with GitHub Actions and disable `plugin_languages_indepth` if your account is not supported
+  # See documentation before enabling
+  plugin_languages_analysis_timeout:
+    description: Languages analysis timeout
+    default: 15
+  
+  # GitHub language categories to display
   plugin_languages_categories:
     description: Language categories to display
     default: markup, programming
@@ -358,16 +388,66 @@ inputs:
     default: 14
   
   # ====================================================================================
-  # 🙋 Introduction
+  # 📌 Starred topics
   
   # Enable or disable plugin
-  plugin_introduction:
-    description: Display account or repository introduction
+  plugin_topics:
+    description: Display starred topics
     default: no
   
-  # Display introduction section title
-  plugin_introduction_title:
-    description: Display introduction section title
+  # Plugin mode
+  plugin_topics_mode:
+    description: Plugin mode
+    default: starred
+  
+  # Topics sorting order
+  plugin_topics_sort:
+    description: Sorting method of starred topics
+    default: stars
+  
+  # Number of topics to display
+  # Set to 0 to disable limitations
+  # When in "starred" mode, additional topics will be grouped into an ellipsis
+  plugin_topics_limit:
+    description: Maximum number of topics to display
+    default: 15
+  
+  # ====================================================================================
+  # 🌟 Recently starred repositories
+  
+  # Enable or disable plugin
+  plugin_stars:
+    description: Display recently starred repositories
+    default: no
+  
+  # Number of stars to display
+  plugin_stars_limit:
+    description: Maximum number of stars to display
+    default: 4
+  
+  # ====================================================================================
+  # 📜 Repository licenses
+  
+  # Enable or disable plugin
+  plugin_licenses:
+    description: Display licenses informations
+    default: no
+  
+  # Command to use to setup target repository
+  # It is required to install all dependencies that will be analyzed with github/licensed
+  plugin_licenses_setup:
+    description: Command to setup target repository
+    default: ""
+  
+  # Display used licenses from both repository license and dependencies licenses ratio
+  plugin_licenses_ratio:
+    description: Display used licenses ratio
+    default: no
+  
+  # Display permissions, limitations and conditions from both repository license and dependencies licenses
+  # Note that this is NOT legal advice, use at your own risk
+  plugin_licenses_legal:
+    description: Display legal informations about used licenses
     default: yes
   
   # ====================================================================================
@@ -405,31 +485,6 @@ inputs:
   plugin_habits_trim:
     description: Trim unused hours on daily chart
     default: no
-  
-  # ====================================================================================
-  # 📜 Repository licenses
-  
-  # Enable or disable plugin
-  plugin_licenses:
-    description: Display licenses informations
-    default: no
-  
-  # Command to use to setup target repository
-  # It is required to install all dependencies that will be analyzed with github/licensed
-  plugin_licenses_setup:
-    description: Command to setup target repository
-    default: ""
-  
-  # Display used licenses from both repository license and dependencies licenses ratio
-  plugin_licenses_ratio:
-    description: Display used licenses ratio
-    default: no
-  
-  # Display permissions, limitations and conditions from both repository license and dependencies licenses
-  # Note that this is NOT legal advice, use at your own risk
-  plugin_licenses_legal:
-    description: Display legal informations about used licenses
-    default: yes
   
   # ====================================================================================
   # 🏅 Repository contributors
@@ -480,42 +535,22 @@ inputs:
       }
   
   # ====================================================================================
-  # 🌟 Recently starred repositories
+  # 🎟️ Follow-up of issues and pull requests
   
   # Enable or disable plugin
-  plugin_stars:
-    description: Display recently starred repositories
+  plugin_followup:
+    description: Display follow-up of repositories issues and pull requests
     default: no
   
-  # Number of stars to display
-  plugin_stars_limit:
-    description: Maximum number of stars to display
-    default: 4
+  # Sections to display
+  plugin_followup_sections:
+    description: Sections to display
+    default: repositories
   
-  # ====================================================================================
-  # 📌 Starred topics
-  
-  # Enable or disable plugin
-  plugin_topics:
-    description: Display starred topics
+  # Compute issues and pull requests per repositories with special highlighting for maintainers and specified users
+  plugin_followup_indepth:
+    description: Indepth follow-up processing
     default: no
-  
-  # Plugin mode
-  plugin_topics_mode:
-    description: Plugin mode
-    default: starred
-  
-  # Topics sorting order
-  plugin_topics_sort:
-    description: Sorting method of starred topics
-    default: stars
-  
-  # Number of topics to display
-  # Set to 0 to disable limitations
-  # When in "starred" mode, additional topics will be grouped into an ellipsis
-  plugin_topics_limit:
-    description: Maximum number of topics to display
-    default: 15
   
   # ====================================================================================
   # 🎭 Comment reactions
@@ -535,10 +570,20 @@ inputs:
     description: Maximum number of issues and pull requests opened to parse
     default: 100
   
+  # Maximum number of discussions opened to parse
+  plugin_reactions_limit_discussions:
+    description: Maximum number of discussions opened to parse
+    default: 100
+  
+  # Maximum number of discussions comments opened to parse
+  plugin_reactions_limit_discussions_comments:
+    description: Maximum number of discussions comments opened to parse
+    default: 100
+  
   # Filter reactions by issue comments age
   # Set to 0 to disable age filtering
   plugin_reactions_days:
-    description: Maximum issue comments age
+    description: Maximum comments age
     default: 0
   
   # Reaction display mode.
@@ -608,48 +653,6 @@ inputs:
     default: no
   
   # ====================================================================================
-  # 🎫 Gists
-  
-  # Enable or disable plugin
-  plugin_gists:
-    description: Display gists metrics
-    default: no
-  
-  # ====================================================================================
-  # 🎟️ Follow-up of issues and pull requests
-  
-  # Enable or disable plugin
-  plugin_followup:
-    description: Display follow-up of repositories issues and pull requests
-    default: no
-  
-  # Sections to display
-  plugin_followup_sections:
-    description: Sections to display
-    default: repositories
-  
-  # ====================================================================================
-  # 👨‍💻 Lines of code changed
-  
-  # Enable or disable plugin
-  plugin_lines:
-    description: Display lines of code metrics
-    default: no
-  
-  # List of repositories that will be skipped
-  plugin_lines_skipped:
-    description: Repositories to skip
-    default: ""
-  
-  # ====================================================================================
-  # 🧮 Repositories traffic
-  
-  # Enable or disable plugin
-  plugin_traffic:
-    description: Display repositories traffic metrics
-    default: no
-  
-  # ====================================================================================
   # ✨ Stargazers over last weeks
   
   # Enable or disable plugin
@@ -682,6 +685,41 @@ inputs:
   plugin_projects_descriptions:
     description: Display projects descriptions
     default: no
+  
+  # ====================================================================================
+  # ♐ Code snippet of the day
+  
+  # Enable or disable plugin
+  plugin_code:
+    description: Display a random code snippet from recent activity
+    default: no
+  
+  # Maximum number of lines that a code snippet can contain
+  plugin_code_lines:
+    description: Maximum number of line that a code snippet can contain
+    default: 12
+  
+  # Number of activity events to load
+  # A high number will consume more requests
+  plugin_code_load:
+    description: Number of events to load
+    default: 100
+  
+  # Set events visibility (use this to restrict events when using a "repo" token)
+  plugin_code_visibility:
+    description: Set events visibility
+    default: public
+  
+  # List of repositories that will be skipped
+  plugin_code_skipped:
+    description: Repositories to skip
+    default: ""
+  
+  # Restrict code snippet languages
+  # These are guessed through linguist
+  plugin_code_languages:
+    description: Restrict code snippet languages
+    default: ""
   
   # ====================================================================================
   # 📰 Recent activity
@@ -730,6 +768,11 @@ inputs:
     description: Repositories to skip
     default: ""
   
+  # Ignored actors (useful to ignore bots users)
+  plugin_activity_ignored:
+    description: Actors to ignore
+    default: github-actions[bot], dependabot[bot], dependabot-preview[bot]
+  
   # ====================================================================================
   # 🏆 Achievements
   
@@ -773,6 +816,37 @@ inputs:
     default: ""
   
   # ====================================================================================
+  # 🎩 Notable contributions
+  
+  # Enable or disable plugin
+  plugin_notable:
+    description: Display notable contributions in organizations
+    default: no
+  
+  # Query filter
+  # Based on GitHub search notation
+  # Supported fields are "stars", "forks" and "watchers"
+  plugin_notable_filter:
+    description: Query filter
+    default: ""
+  
+  # Filter repositories depending on which type of account it is hosted
+  plugin_notable_from:
+    description: Filter by repository host account type
+    default: organization
+  
+  # Also display repository name along with organization name
+  # Note that repositories hosted by user account will always be displayed fully
+  plugin_notable_repositories:
+    description: Also display repository name
+    default: no
+  
+  # Compute notable contributions with measured impact
+  plugin_notable_indepth:
+    description: Indepth notable contributions processing
+    default: no
+  
+  # ====================================================================================
   # 💬 Discussions
   
   # Enable or disable plugin
@@ -789,24 +863,30 @@ inputs:
     default: no
   
   # ====================================================================================
-  # 🎩 Notable contributions
+  # 👨‍💻 Lines of code changed
   
   # Enable or disable plugin
-  plugin_notable:
-    description: Display notable contributions in organizations
+  plugin_lines:
+    description: Display lines of code metrics
     default: no
   
-  # Query filter
-  # Based on GitHub search notation
-  # Supported fields are "stars", "forks" and "watchers"
-  plugin_notable_filter:
-    description: Query filter
+  # List of repositories that will be skipped
+  plugin_lines_skipped:
+    description: Repositories to skip
     default: ""
   
-  # Also display repository name along with organization name
-  plugin_notable_repositories:
-    description: Also display repository name
+  # ====================================================================================
+  # 🧮 Repositories traffic
+  
+  # Enable or disable plugin
+  plugin_traffic:
+    description: Display repositories traffic metrics
     default: no
+  
+  # List of repositories that will be skipped
+  plugin_traffic_skipped:
+    description: Repositories to skip
+    default: ""
   
   # ====================================================================================
   # 📓 Repositories
@@ -823,33 +903,25 @@ inputs:
     default: ""
   
   # ====================================================================================
-  # ♐ Code snippet of the day
+  # 🎫 Gists
   
   # Enable or disable plugin
-  plugin_code:
-    description: Display a random code snippet from recent activity
+  plugin_gists:
+    description: Display gists metrics
     default: no
   
-  # Maximum number of lines that a code snippet can contain
-  plugin_code_lines:
-    description: Maximum number of line that a code snippet can contain
-    default: 12
+  # ====================================================================================
+  # 🙋 Introduction
   
-  # Number of activity events to load
-  # A high number will consume more requests
-  plugin_code_load:
-    description: Number of events to load
-    default: 100
+  # Enable or disable plugin
+  plugin_introduction:
+    description: Display account or repository introduction
+    default: no
   
-  # Set events visibility (use this to restrict events when using a "repo" token)
-  plugin_code_visibility:
-    description: Set events visibility
-    default: public
-  
-  # List of repositories that will be skipped
-  plugin_code_skipped:
-    description: Repositories to skip
-    default: ""
+  # Display introduction section title
+  plugin_introduction_title:
+    description: Display introduction section title
+    default: yes
   
   # ====================================================================================
   # 💕 GitHub Sponsors
@@ -945,8 +1017,9 @@ inputs:
   # Music provider token
   # This may be required depending on music provider used and plugin mode
   # - "apple"   : not required
-  # - "spotify" : required for "recent" mode, format is "client_id, client_secret, refresh_token"
+  # - "spotify" : required for "recent" or "top" mode, format is "client_id, client_secret, refresh_token"
   # - "lastfm"  : required, format is "api_key"
+  # - "youtube" : required for "recent" mode, format is "cookie"
   plugin_music_token:
     description: Music provider personal token
     default: ""
@@ -970,6 +1043,16 @@ inputs:
   plugin_music_played_at:
     description: Display when the track was played
     default: no
+  
+  # Time range for "top" mode
+  plugin_music_time_range:
+    description: Time period for top mode
+    default: short
+  
+  # Option for "top" mode to select tracks or artists
+  plugin_music_top_type:
+    description: Whether to show tracks or artists in top mode
+    default: tracks
   
   # Username on music provider service
   plugin_music_user:
@@ -1209,34 +1292,6 @@ inputs:
     default: 5m
   
   # ====================================================================================
-  # 📸 Website screenshot
-  
-  # Enable or disable plugin
-  plugin_screenshot:
-    description: Display a screenshot of any website
-    default: no
-  
-  # Screenshot title caption
-  plugin_screenshot_title:
-    description: Screenshot title caption
-    default: Screenshot
-  
-  # Website to take screenshot
-  plugin_screenshot_url:
-    description: Website to take screenshot
-    default: ""
-  
-  # Selector to take in screenshot
-  plugin_screenshot_selector:
-    description: Selector to take in screenshot
-    default: body
-  
-  # Display or remove default page background
-  plugin_screenshot_background:
-    description: Display or remove default page background
-    default: yes
-  
-  # ====================================================================================
   # 💉 Nightscout
   
   # Enable or disable plugin
@@ -1273,6 +1328,52 @@ inputs:
   plugin_nightscout_urgenthighalert:
     description: When the blood sugar is considered urgently high
     default: 250
+  
+  # ====================================================================================
+  # 💩 PoopMap plugin
+  
+  # Enable or disable plugin
+  plugin_poopmap:
+    description: Display PoopMap stats
+    default: no
+  
+  # PoopMap API token
+  plugin_poopmap_token:
+    description: PoopMap API token
+    default: ""
+  
+  # Time range to use for displayed stats
+  plugin_poopmap_days:
+    description: PoopMap time range
+    default: 7
+  
+  # ====================================================================================
+  # 📸 Website screenshot
+  
+  # Enable or disable plugin
+  plugin_screenshot:
+    description: Display a screenshot of any website
+    default: no
+  
+  # Screenshot title caption
+  plugin_screenshot_title:
+    description: Screenshot title caption
+    default: Screenshot
+  
+  # Website to take screenshot
+  plugin_screenshot_url:
+    description: Website to take screenshot
+    default: ""
+  
+  # Selector to take in screenshot
+  plugin_screenshot_selector:
+    description: Selector to take in screenshot
+    default: body
+  
+  # Display or remove default page background
+  plugin_screenshot_background:
+    description: Display or remove default page background
+    default: yes
   
 
 # ====================================================================================

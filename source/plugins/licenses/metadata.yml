@@ -1,9 +1,10 @@
 name: "📜 Repository licenses"
-cost: N/A
 category: github
 index: 4
 supports:
   - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin

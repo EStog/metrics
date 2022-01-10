@@ -7,7 +7,7 @@ The *achievements* plugin displays several highlights about what you achieved on
     <details open><summary>Compact display</summary>
       <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.achievements.compact.svg">
     </details>
-    <details open><summary>Detailed display</summary>
+    <details><summary>Detailed display</summary>
       <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.achievements.svg">
     </details>
     <img width="900" height="1" alt="">
@@ -36,9 +36,10 @@ It also lets you quickly see at a glance what this user primarly use GitHub for,
   with:
     # ... other options
     plugin_achievements: yes
-    plugin_achievements_threshold: B       # Display achievements with rank B or higher
-    plugin_achievements_secrets: yes       # Display unlocked secrets achievements
-    plugin_achievements_ignored: octonaut  # Hide octonaut achievement
-    plugin_achievements_limit: 0           # Display all unlocked achievement matching threshold and secrets params
-    plugin_achievements_display: compact   # Use compact display
+    plugin_achievements_threshold: B      # Display achievements with rank B or higher
+    plugin_achievements_secrets: yes      # Display unlocked secrets achievements
+    plugin_achievements_display: compact  # Use compact display
+    plugin_achievements_limit: 0          # Display all unlocked achievements (no limit)
+    plugin_achievements_ignored: octonaut # Hide "octonaut" achievement
+    plugin_achievements_only: explorer    # Display only "explorer" achievement (don't use with "ignored" option)
 ```

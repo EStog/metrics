@@ -4,15 +4,17 @@ The *languages* plugin displays which programming languages you use the most acr
 
 <table>
   <td align="center">
-    <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.svg">
-    <details open><summary>With both total bytes size and percentage version</summary>
-      <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.details.svg">
+    <details open><summary>Indepth analysis (clone and analyze repositories)</summary>
+      <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.indepth.svg">
     </details>
-    <details open><summary>Recently used version (based on recent activity)</summary>
+    <details open><summary>Recently used (analyze recent activity events)</summary>
       <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.recent.svg">
     </details>
-    <details><summary>Indepth analysis (clone, analyze and extract commits)</summary>
-      <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.indepth.svg">
+    <details><summary>Default algorithm</summary>
+      <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.svg">
+    </details>
+    <details><summary>Default algorithm (with details)</summary>
+      <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.languages.details.svg">
     </details>
     <img width="900" height="1" alt="">
   </td>
@@ -28,7 +30,7 @@ It is also possible to use a predefined set of colors from [colorsets.json](colo
 Languages statistics are computed using the top languages provided by GitHub of each repository you contributed to.
 If you work a lot with other people, these numbers may be less representative of your actual work.
 
-The `plugin_languages_indepth` option lets you get more accurate metrics by cloning each repository you contributed to, running [github/linguist](https://github.com/github/linguist) on it and then iterating over patches matching your username from `git log`. This method is slower than the first one.
+The `plugin_languages_indepth` option lets you get more accurate metrics by cloning each repository you contributed to, running [linguist-js](https://github.com/Nixinova/Linguist) and then iterating over patches matching your username from `git log`. This method is slower than the first one.
 
 > ⚠️ Although *metrics* does not send any code to external sources, you must understand that when using this option repositories are cloned locally temporarly on the GitHub Action runner. If you work with sensitive data or company code, it is advised to keep this option disabled. *Metrics* and its authors cannot be held responsible for any resulting code leaks, use at your own risk.
 > Source code is available for auditing at [analyzers.mjs](/source/plugins/languages/analyzers.mjs)
@@ -52,16 +54,18 @@ For better results, it's advised to add either your surnames and eventually no-r
     plugin_languages: yes
     plugin_languages_ignored: html, css                           # List of languages to ignore
     plugin_languages_skipped: my-test-repo                        # List of repositories to skip
+    plugin_languages_limit: 8                                     # Display up to 8 languages
+    plugin_languages_sections: most-used, recently-used           # Display most used and recently used
     plugin_languages_colors: "0:orange, javascript:#ff0000, ..."  # Make most used languages orange and JavaScript red
     plugin_languages_aliases: "JavaScript:JS, TypeScript:TS, ..." # Customize languages names with aliases
     plugin_languages_details: bytes-size, percentage              # Additionally display total bytes size and percentage
     plugin_languages_threshold: 2%                                # Hides all languages less than 2%
-    plugin_languages_limit: 8                                     # Display up to 8 languages
-    plugin_languages_sections: most-used, recently-used           # Display most used and recently used languages stats
+    languages stats
     plugin_languages_indepth: no                                  # Get indepth stats (see documentation before enabling)
+    plugin_languages_analysis_timeout: 15                         # Set maximum time for indepth analysis
     plugin_languages_categories: programming                      # Display only languages that match these categories in most-used section
     plugin_languages_recent_categories: markup, programming, data # Display only languages that match these categories in recently-used section
     plugin_languages_recent_load: 500                             # Load up to 500 events to compute recently used stats
     plugin_languages_recent_days: 7                               # Limit recently used stats to last week
-    commits_authoring: lowlighter@users.noreply.github.com        # Surnames or email addresses used to identify your commits
+    commits_authoring: octocat@users.noreply.github.com           # Surnames or email addresses used to identify your commits
 ```

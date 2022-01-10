@@ -1,11 +1,12 @@
 name: "📰 Recent activity"
-cost: 1 REST request per 100 events
 category: github
-index: 16
+index: 13
 supports:
   - user
   - organization
   - repository
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin
@@ -86,4 +87,9 @@ inputs:
     type: array
     format: comma-separated
     default: ""
-    example: my-repo-1, my-repo-2, owner/repo-3 ...
+    example: my-repo-1, my-repo-2, owner/repo-3, ...
+
+  # Ignored actors (useful to ignore bots users)
+  plugin_activity_ignored:
+    description: Actors to ignore
+    default: github-actions[bot], dependabot[bot], dependabot-preview[bot]

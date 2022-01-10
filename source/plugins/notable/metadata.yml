@@ -1,9 +1,10 @@
 name: "🎩 Notable contributions"
-cost: 1 GraphQL request per 100 repositories fetched
 category: github
-index: 20
+index: 15
 supports:
   - user
+scopes:
+  - public_access
 inputs:
 
   # Enable or disable plugin
@@ -21,8 +22,25 @@ inputs:
     default: ""
     example: stars:>500 forks:>100
 
+  # Filter repositories depending on which type of account it is hosted
+  plugin_notable_from:
+    description: Filter by repository host account type
+    type: string
+    default: organization
+    values:
+      - all           #
+      - organization  # Only hosted by organization accounts
+      - user          # Only hosted by user accounts
+
   # Also display repository name along with organization name
+  # Note that repositories hosted by user account will always be displayed fully
   plugin_notable_repositories:
     description: Also display repository name
+    type: boolean
+    default: no
+
+  # Compute notable contributions with measured impact
+  plugin_notable_indepth:
+    description: Indepth notable contributions processing
     type: boolean
     default: no

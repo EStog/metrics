@@ -4,10 +4,10 @@ The *music* plugin lets you display :
 
 <table>
   <td align="center">
-    <details open><summary>🎼 Favorite tracks version</summary>
+    <details open><summary>Random tracks from a playlist</summary>
       <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.music.playlist.svg">
     </details>
-    <details open><summary>Recently listened version</summary>
+    <details open><summary>Recently listened</summary>
       <img src="https://github.com/lowlighter/lowlighter/blob/master/metrics.plugin.music.recent.svg">
     </details>
     <img width="900" height="1" alt="">
@@ -67,6 +67,22 @@ This mode is not supported for now.
 
 </details>
 
+<details>
+<summary>YouTube Music</summary>
+
+Extract the *playlist* URL of the playlist you want to share.
+
+To do so, Open YouTube Music and select the playlist you want to share.
+
+Extract the source link from copying it from the address bar:
+```
+https://music.youtube.com/playlist?list=********
+```
+
+And use this value in `plugin_music_playlist` option.
+
+</details>
+
 #### ℹ️ Examples workflows
 
 [➡️ Available options for this plugin](metadata.yml)
@@ -78,12 +94,14 @@ This mode is not supported for now.
     plugin_music: yes
     plugin_music_limit: 4                   # Limit to 4 entries
     plugin_music_playlist: https://******** # Use extracted playlist link
-                                            #   (plugin_music_provider and plugin_music_mode will be set automatically)
+    # plugin_music_provider: (will be guessed through plugin_music_playlist)
+    # plugin_music_mode: (will be set to "playlist" when plugin_music_playlist is provided)
 ```
 
-### Recently played mode
+### Recently played & top modes
 
-Display tracks you have played recently.
+- **Recently played**: Display tracks you have played recently.
+- **Top**: Display your top artists/tracks for a certain time period.
 
 Select a music provider below for additional instructions.
 
@@ -113,7 +131,7 @@ Open the settings and add a new *Redirect url*. Normally it is used to setup cal
 Forge the authorization url with your `client_id` and the encoded `redirect_uri` you whitelisted, and access it from your browser:
 
 ```
-https://accounts.spotify.com/authorize?client_id=********&response_type=code&scope=user-read-recently-played&redirect_uri=https%3A%2F%2Flocalhost
+https://accounts.spotify.com/authorize?client_id=********&response_type=code&scope=user-read-recently-played%20user-top-read&redirect_uri=https%3A%2F%2Flocalhost
 ```
 
 When prompted, authorize your application.
@@ -147,7 +165,7 @@ It should return a JSON response with the following content:
 {
   "access_token":"********",
   "expires_in": 3600,
-  "scope":"user-read-recently-played",
+  "scope":"user-read-recently-played user-top-read",
   "token_type":"Bearer",
   "refresh_token":"********"
 }
@@ -168,9 +186,30 @@ Register your API key to finish setup.
 
 </details>
 
+<details>
+<summary>YouTube Music</summary>
+
+Extract your YouTube Music cookies.
+
+To do so, open [YouTube Music](https://music.youtube.com) (whilst logged in) on any modern browser
+
+Open the developer tools (Ctrl-Shift-I) and select the “Network” tab
+
+![Open developer tools](/.github/readme/imgs/plugin_music_recent_youtube_cookie_1.png)
+
+Find an authenticated POST request. The simplest way is to filter by /browse using the search bar of the developer tools. If you don’t see the request, try scrolling down a bit or clicking on the library button in the top bar.
+
+Click on the Name of any matching request. In the “Headers” tab, scroll to the “Cookie” and copy this by right-clicking on it and selecting “Copy value”.
+
+![Copy cookie value](/.github/readme/imgs/plugin_music_recent_youtube_cookie_2.png)
+
+</details>
+
 #### ℹ️ Examples workflows
 
 [➡️ Available options for this plugin](metadata.yml)
+
+##### Recent
 
 ```yaml
 - uses: lowlighter/metrics@latest
@@ -194,5 +233,33 @@ Register your API key to finish setup.
     plugin_music_limit: 4          # Limit to 4 entries
     plugin_music_user: .user.login # Use same username as GitHub login
     plugin_music_token: ${{ secrets.LASTFM_API_KEY }}
+```
 
+##### Top
+
+```yaml
+- uses: lowlighter/metrics@latest
+  with:
+    # ... other options
+    plugin_music: yes
+    plugin_music_provider: spotify # Use Spotify as provider
+    plugin_music_mode: top         # Set plugin mode
+    plugin_music_limit: 4          # Limit to 4 entries, maximum is 50 for "top" mode with spotify
+    plugin_music_top_type: tracks  # Set type for "top" mode; either tracks or artists
+    plugin_music_time_range: short # Set time range for "top" mode; either short (4 weeks), medium (6 months) or long (several years)
+    plugin_music_token: "${{ secrets.SPOTIFY_CLIENT_ID }}, ${{ secrets.SPOTIFY_CLIENT_SECRET }}, ${{ secrets.SPOTIFY_REFRESH_TOKEN }}"
+```
+
+```yaml
+- uses: lowlighter/metrics@latest
+  with:
+    # ... other options
+    plugin_music: yes
+    plugin_music_provider: lastfm  # Use Last.fm as provider
+    plugin_music_mode: top         # Set plugin mode
+    plugin_music_limit: 4          # Limit to 4 entries
+    plugin_music_top_type: artists # Set type for "top" mode; either tracks or artists
+    plugin_music_time_range: long  # Set time range for "top" mode; either short (4 weeks), medium (6 months) or long (several years)
+    plugin_music_user: .user.login # Use same username as GitHub login
+    plugin_music_token: ${{ secrets.LASTFM_API_KEY }}
 ```

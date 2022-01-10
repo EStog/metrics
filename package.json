@@ -1,6 +1,6 @@
 {
   "name": "metrics",
-  "version": "3.14.0",
+  "version": "3.17.0",
   "description": "An infographics generator with 30+ plugins and 200+ options to display stats about your GitHub account and render them as SVG, Markdown, PDF or JSON!",
   "main": "index.mjs",
   "scripts": {
@@ -26,45 +26,47 @@
   },
   "homepage": "https://github.com/lowlighter/metrics#readme",
   "dependencies": {
-    "@actions/core": "^1.5.0",
+    "@actions/core": "^1.6.0",
     "@actions/github": "^4.0.0",
     "@octokit/graphql": "^4.8.0",
-    "@octokit/rest": "^18.11.1",
-    "@primer/css": "^17.11.0",
-    "axios": "^0.21.1",
+    "@octokit/rest": "^18.12.0",
+    "@primer/css": "^19.1.0",
+    "axios": "^0.24.0",
     "clipboard": "^2.0.8",
     "compression": "^1.7.4",
+    "csso": "^5.0.0",
     "ejs": "^3.1.6",
     "emoji-name-map": "^1.2.9",
     "express": "^4.17.1",
-    "express-rate-limit": "^5.3.0",
+    "express-rate-limit": "^6.0.1",
     "faker": "^5.5.3",
     "jimp": "^0.16.1",
     "js-yaml": "^4.1.0",
-    "linguist-js": "^2.1.1",
-    "marked": "^3.0.0",
+    "linguist-js": "^2.1.4",
+    "marked": "^4.0.3",
     "memory-cache": "^0.2.0",
     "minimatch": "^3.0.4",
     "node-chartist": "^1.0.5",
-    "node-fetch": "^3.0.0",
-    "open-graph-scraper": "^4.9.0",
+    "node-fetch": "^3.1.0",
+    "open-graph-scraper": "^4.11.0",
     "png-js": "^1.0.0",
     "prismjs": "^1.25.0",
-    "puppeteer": "^10.4.0",
+    "puppeteer": "^13.0.0",
+    "purgecss": "^4.1.2",
     "rss-parser": "^3.12.0",
-    "sanitize-html": "^2.5.0",
-    "simple-git": "^2.45.0",
-    "svgo": "^2.7.0",
+    "sanitize-html": "^2.6.0",
+    "simple-git": "^2.48.0",
+    "svgo": "^2.8.0",
     "twemoji-parser": "^13.1.0",
-    "vue": "^2.6.12",
+    "vue": "^2.6.14",
     "vue-prism-component": "^1.2.0",
-    "xml-formatter": "^2.4.0"
+    "xml-formatter": "^2.6.0"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
-    "jest": "^27.2.0",
-    "libxmljs2": "^0.28.0",
-    "nodemon": "^2.0.7"
+    "eslint": "^8.5.0",
+    "jest": "^27.4.0",
+    "libxmljs2": "^0.29.0",
+    "nodemon": "^2.0.15"
   },
   "jest": {
     "testEnvironment": "node",
@@ -73,6 +75,6 @@
   },
   "optionalDependencies": {
     "gifencoder": "^2.0.1",
-    "utf-8-validate": "^5.0.5"
+    "utf-8-validate": "^5.0.7"
   }
 }
