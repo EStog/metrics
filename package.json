@@ -75,6 +75,6 @@
   },
   "optionalDependencies": {
     "gifencoder": "^2.0.1",
-    "utf-8-validate": "^5.0.7"
+    "utf-8-validate": "^6.0.0"
   }
 }
