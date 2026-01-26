@@ -86,6 +86,6 @@
     "libxmljs2": "^0.31.0",
     "node-chartist": "^1.0.5",
     "rss": "^1.2.2",
-    "yargs-parser": "^21.1.1"
+    "yargs-parser": "^22.0.0"
   }
 }
